@@ -40,7 +40,7 @@
 
 // const styles = StyleSheet.create({})
 
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Button, Modal } from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Button, Modal, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import InputText from '../components/InputText'
 import Antdesign from 'react-native-vector-icons/AntDesign'
@@ -86,62 +86,83 @@ const Login = ({navigation}) => {
     });
     
     
+    const onGoogleButtonPress=async()=> {
+      // Check if your device supports Google Play
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      // Get the users ID token
+      const { idToken } = await GoogleSignin.signIn();
+    
+      // Create a Google credential with the token
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+    
+      // Sign-in the user with the credential
+      return auth().signInWithCredential(googleCredential);
+    }
 
-const onGoogleButtonPress=async()=> {
-  try{
-    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-    // Get the users ID token
-    const { idToken } = await GoogleSignin.signIn();
-  
-    // Create a Google credential with the token
-    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-  
-    // Sign-in the user with the credential
-    return auth().signInWithCredential(googleCredential);
+const onFacebookButtonPress=async()=> {
+  // Attempt login with permissions
+  const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
 
-    console.log("user Sign in successfully")
-  } catch(error) {
-    console.log(error)
+  if (result.isCancelled) {
+    throw 'User cancelled the login process';
   }
 
-  // Check if your device supports Google Play
- 
-}
+  // Once signed in, get the users AccessToken
+  const data = await AccessToken.getCurrentAccessToken();
 
-const handleFacebookLogin = async () => {
-  try {
-    const result = await LoginManager.logInWithPermissions(['email']);
-    if (result.isCancelled) {
-      console.log('Facebook login cancelled');
-    } else {
-      // Get the access token
-      const data = await AccessToken.getCurrentAccessToken();
-      if (data) {
-        console.log('Facebook access token:', data.accessToken.toString());
-        // Access token can be used to retrieve user data from Facebook
-      }
-    }
-  } catch (error) {
-    console.log('Error logging in with Facebook:', error);
+  if (!data) {
+    throw 'Something went wrong obtaining access token';
   }
 
   // Create a Firebase credential with the AccessToken
-
+  const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
 
   // Sign-in the user with the credential
   return auth().signInWithCredential(facebookCredential);
 }
+const  correctPassword ='12345678'
+
+ 
+const handleSubmit = () => {
+  // Check if password contains non-numeric characters
+  if (!/^\d+$/.test(Password)) {
+    Alert.alert(
+      "Invalid Password",
+      "Password should only contain numeric characters.",
+      [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+      { cancelable: false }
+    );
+    return;
+  }
+
+  // Check if password matches the correct password
+  if (Password !== correctPassword) {
+    Alert.alert(
+      "Invalid Password",
+      "The password you entered is incorrect. Please try again.",
+      [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+  
+     
+      { cancelable: false }
+    );
+  } 
+  
+  else {
+    console.log("Password is correct");
+    // Handle successful password case
+    setModalVisble(true)
+  }
+};
+
 
   return (
     <View style={{backgroundColor:'white', flex:1,}}>
-    <View style={{flexDirection:"row",justifyContent:'space-between',alignItems:'center',  width:'60%' }}>
-    <TouchableOpacity style={{alignItems:'flex-start', justifyContent:'flex-start', }}>
-    <View style={{alignItems:'flex-start', justifyContent:'flex-start'}}>
+    <View style={{flexDirection:"row",justifyContent:'space-between',alignItems:'center',  width:'60%', marginBottom:20,marginTop:5 }}>
+    <TouchableOpacity style={{alignItems:'flex-start', justifyContent:'flex-start', }} onPress={()=>navigation.navigate('Intro')}>
     <Antdesign name='left' size={25} color={'black'} style={{alignSelf:"flex-start"}}/>
-    </View>
     </TouchableOpacity>
     <Text style={{
-  
+
  textAlign:'center',
  color:'black',
  alignItems:'center', 
@@ -154,7 +175,7 @@ const handleFacebookLogin = async () => {
     </View>
      <InputText state={setEmail} val={Email} icon={'mail'} usedicon={true}/>
 
-    <InputText state={setPassword} val={Password} Title={'Enter your Password'} icon={'lock'} Feathericon={true}/>
+    <InputText state={setPassword} val={Password} Title={'Enter your Password'} icon={'lock'} Feathericon={true} length={8} />
 
    <TouchableOpacity style={{flex:0.}}onPress={()=>navigation.navigate('Forgotpassword')}>
     <Text style={{color:'teal', alignSelf:'flex-end', marginEnd:15}}>
@@ -162,7 +183,7 @@ const handleFacebookLogin = async () => {
     </Text>
     </TouchableOpacity>
   {/* <CustomButton/> */}
-<CustomButton title={'Login'} action={()=>setModalVisble(true)}/>
+<CustomButton title={'Login'} action={handleSubmit ? handleSubmit :()=>setModalVisble(true)}/>
  <View style={{alignItems:'center', justifyContent:'space-between', }}>
   <View style={{flexDirection:'row', alignItems:"center",margin:5}}>
   <Text style={{color:'darkgrey'}}>
@@ -177,7 +198,7 @@ const handleFacebookLogin = async () => {
         <Space Imagein={require('../Images/g.png')} image={true} action={() => onGoogleButtonPress().then(() => console.log('Signed in with Google!'))}
     />
         <Space  Ionicon={true} name={"logo-apple"} intext={'Sign in with Apple'} />
-        <Space icon={true} name={'facebook-with-circle'} color={'blue'} intext={'Sign in With Facebook'} action={()=>handleFacebookLogin().then(()=>console.log('Signed in with Facebook'))}/>
+        <Space icon={true} name={'facebook-with-circle'} color={'blue'} intext={'Sign in With Facebook'} action={()=>onFacebookButtonPress().then(()=>console.log('Signed in with Facebook'))}/>
        
   </View>
   
@@ -202,21 +223,6 @@ const handleFacebookLogin = async () => {
    
    </Modal>
 
-   <View>
-      <LoginButton
-        publishPermissions={['email']}
-        onLoginFinished={(error, result) => {
-          if (error) {
-            console.log('Facebook login error:', error);
-          } else if (result.isCancelled) {
-            console.log('Facebook login cancelled');
-          } else {
-            handleFacebookLogin();
-          }
-            console.log("🚀 ~ Login ~ handleFacebookLogin:", handleFacebookLogin)
-        }}
-      />
-    </View>
 
 <SigninWithGoogle/>
     </View>

@@ -33,6 +33,10 @@ const SignUp=()=>{
   });
 }
 
+const HandleSignUp=()=>{
+  SignUp()
+  {()=>setModalVisble(true)}
+}
 
 
   return (
@@ -65,7 +69,7 @@ const SignUp=()=>{
       </Text>
     </TouchableOpacity>
     <View style={{marginTop:20}}>
-   <CustomButton title={'SignUp'} action={()=>setModalVisble(true)}/>
+   <CustomButton title={'SignUp'} action={HandleSignUp}/>
    </View>
    <View style={{flexDirection:"row", justifyContent:'center'}}>
    <Text style={{color:'black'}}>Already have an account ?</Text>

@@ -13,7 +13,9 @@ const Forgotpassword = ({navigation}) => {
   
   return (
     <View style={{flex:1, backgroundColor:'white'}}>
+      <TouchableOpacity onPress={()=>navigation.navigate('Login')}>
     <AntDesign name='left' color={'black'} size={30} />
+    </TouchableOpacity>
     <View style={{flex:0.6, justifyContent:'center', }}>
      <Text style={{color:'black', fontSize:23, fontWeight:"700",alignSelf:'center',width:'88%', margin:5}}>Forgot Your Password?</Text>
      <Text style={{color:'darkgrey', alignSelf:'center',width:'88%',fontSize:16,}}>Enter your email or your phone number, we will send you a confirmation code</Text>

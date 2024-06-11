@@ -58,7 +58,7 @@ const App = () => {
   return (
     <Provider store={Store}>
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName='NewScreen'  >
+      <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName='Login'  >
         {time?
 
 <Stack.Screen name='Splash' component={Splash}/>
@@ -76,6 +76,7 @@ const App = () => {
       <Stack.Screen name='InputText' component={InputText}/>
       <Stack.Screen name='NewScreen' component={NewSceen}/>
       <Stack.Screen name='Practice' component={Practice}/>
+      <Stack.Screen name='Newpassword' component={NewPassword}/>
       {/* <Stack.Screen name='SigninWithGoogle' component={SigninWithGoogle}/> */}
 
       </Stack.Navigator>

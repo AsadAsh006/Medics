@@ -4,11 +4,11 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import InputText from '../components/InputText'
 import CustomButton from '../components/CustomButton'
 import Feather from 'react-native-vector-icons/Feather'
-const NewPassword = () => {
+const NewPassword = ({navigation}) => {
     const [modalVisible, setModalVisble] =useState(false)
   return (
     <View style={{flex:1, backgroundColor:'white'}}>
-        <TouchableOpacity style={{margin:10}}>
+        <TouchableOpacity style={{margin:10}} onPress={()=>navigation.navigate('Verification')}>
      <AntDesign name='left' color={'black'} size={30}/>
      </TouchableOpacity>
      <View style={{flex:0.55, justifyContent:'center',marginBottom:10 }}>
@@ -33,7 +33,7 @@ const NewPassword = () => {
    <Text style={{color:'black', fontWeight:"bold", fontSize:19, textAlign:'center',margin:10 }}>Success</Text>
    <Text style={{color:'darkgrey', textAlign:'center', width:'93%'}}>You have successfully reset your password.</Text>
    
-   <CustomButton title={'Go to home'} action={()=>setModalVisble(false)}/>
+   <CustomButton title={'Go to home'} action={()=>navigation.navigate('Login')}/>
    </View>
    
  </View>
